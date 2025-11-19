@@ -293,7 +293,7 @@ with st.form(key="upload_form"):
     
     # B. Las credenciales de la DB
     st.subheader("2. Credenciales de tu Base de Datos (Supabase)")
-    st.markdown("¿No tienes base de datos? [Regístrate en Supabase aquí](https://supabase.com/dashboard/sign-up)")
+    st.info("Si aún no tienes credenciales, [crea tu cuenta gratuita en Supabase](https://supabase.com/dashboard/sign-up).")
     col1, col2 = st.columns(2)
     with col1:
         db_host = st.text_input("Host (Servidor)", placeholder="db.xxxxxxxx.supabase.co")
@@ -367,6 +367,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
