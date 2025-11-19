@@ -1,0 +1,8 @@
+streamlit
+pandas
+numpy
+yfinance
+requests
+sqlalchemy
+psycopg2-binary
+openpyxl
