@@ -294,6 +294,17 @@ with st.form(key="upload_form"):
     # B. Las credenciales de la DB
     st.subheader("2. Credenciales de tu Base de Datos (Supabase)")
     st.info("Si aún no tienes credenciales, [crea tu cuenta gratuita en Supabase](https://supabase.com/dashboard/sign-up).")
+    with st.expander("ℹ️ Ver instructivo: ¿Cómo obtengo estos datos?"):
+        st.write("""
+        1. Entra a tu proyecto en Supabase.
+        2. Ve al icono de engranaje ⚙️ (**Settings**) en el menú izquierdo.
+        3. Haz clic en **Database**.
+        4. Baja hasta la sección **Connection parameters**.
+        5. Ahí encontrarás el **Host**, **Database name** y **User**.
+        6. *Nota: La contraseña es la que creaste al iniciar el proyecto.*
+        """)
+        # Si tienes una imagen del paso a paso en tu carpeta del proyecto:
+        # st.image("instrucciones_supabase.png")
     col1, col2 = st.columns(2)
     with col1:
         db_host = st.text_input("Host (Servidor)", placeholder="db.xxxxxxxx.supabase.co")
@@ -367,6 +378,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
