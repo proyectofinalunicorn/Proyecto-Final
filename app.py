@@ -248,8 +248,6 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
                         st.warning(f"Advertencia: Datos ya cargados el día de hoy en '{table_name_hist}'.")
                     else:
                         raise ex
-        except Exception as e:
-            raise e
 
         ## GUARDADO DE DATOS HISTORICOS DOLAR
         
@@ -422,6 +420,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
