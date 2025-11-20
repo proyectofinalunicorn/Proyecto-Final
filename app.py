@@ -184,7 +184,7 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
                     Column('rendimiento_usd', Float)
                 )
                 metadata.create_all(engine)
-                st.write(f"Tabla '{table_name}' verificada.")
+                st.write(f"Tabla '{table_name}' creada.")
 
                 # ELIMINACION DE DATOS
                 connection.execute(text(f"TRUNCATE TABLE {table_name} RESTART IDENTITY;"))
@@ -219,7 +219,7 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
             # Drop and recreate the table to ensure schema is updated
             metadata_hist.drop_all(engine_hist)
             metadata_hist.create_all(engine_hist)
-            st.write(f"Tabla '{table_name_hist}' recreada.")
+            st.write(f"Tabla '{table_name_hist}' creada.")
 
             with engine_hist.connect() as connection:
                 # INSERCIÓN DE DATOS
@@ -267,7 +267,7 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
                 with engine_dolar.connect() as connection:
                     try:
                         df_historico_dolar.to_sql(table_name_dolar, connection, if_exists='append', index=False)
-                        st.success(f"Carga de datos de Dólar exitosa")
+                        st.write(f"Tabla '{table_name_dolar}' creada.")
                     except Exception as ex:
                         if "violates unique constraint" in str(ex) or "duplicate key value" in str(ex):
                             st.warning(f"Datos del Dólar ya cargados el día de hoy")
@@ -411,3 +411,4 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
