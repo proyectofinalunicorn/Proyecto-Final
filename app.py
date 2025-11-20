@@ -37,10 +37,10 @@ def mostrar_instructivo():
 
     st.markdown("""
     **4. Descargar**
-    Haz clic en el botón **Descargarr**. Se descargará un archivo `.xlsx`.
+    Haz clic en el botón **Descargar**. Se descargará un archivo `.xlsx`.
     
     ---
-    ✅ **¡Listo!** Ahora cierra esta ventana y sube ese archivo en el paso 1.
+    ✅ **¡Listo!** Ahora cierra esta ventana y sube ese archivo.
     """)
 
 if 'procesamiento_listo' not in st.session_state:
@@ -356,7 +356,7 @@ with st.form(key="upload_form"):
     st.divider()
     
     # B. Las credenciales de la DB
-    st.subheader("2. Credenciales de tu Base de Datos (Supabase)")
+    st.subheader("Credenciales de tu Base de Datos (Supabase)")
     st.info("Si aún no tienes credenciales, [crea tu cuenta gratuita en Supabase](https://supabase.com/dashboard/sign-up).")
     with st.expander("ℹ️ Ver instructivo: ¿Cómo obtengo estos datos?"):
         st.write("""
@@ -450,6 +450,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
