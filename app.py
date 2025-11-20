@@ -299,13 +299,19 @@ with st.form(key="upload_form"):
         1. Crea tu cuenta y proyecto en Supabase.
         2. Entra a tu proyecto.
         3. Ve al botón "Connect" que se encuentra en la parte superior de la pantalla:
+        """)
         st.image("captura_supabase.png", caption="Pantalla de configuración de Supabase", use_container_width=True)
+        st.write("""
         4. Selecciona el Method "Session pooler":
+        """)
         st.image("captura_supabase_2.png", caption="Pantalla de configuración de Supabase", use_container_width=True)
-        4. Abre la opción "View parameters":
+        st.write("""
+        5. Abre la opción "View parameters":
+        """)
         st.image("captura_supabase_3.png", caption="Pantalla de configuración de Supabase", use_container_width=True)
-        5. Ahí encontrarás el **Host**, **Database name** y **User**.
-        6. *Nota: La contraseña es la que creaste al iniciar el proyecto.*
+        st.write("""
+        6. Ahí encontrarás el **Host**, **Database name** y **User**.
+        7. *Nota: La contraseña es la que creaste al iniciar el proyecto.*
         """)
     col1, col2 = st.columns(2)
     with col1:
@@ -380,6 +386,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
