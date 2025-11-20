@@ -343,13 +343,12 @@ st.title("💰 Análisis de inversiones")
 st.write("Sube tu reporte de Balanz y completa los datos de tu Base de Datos de Supabase (PostgreSQL).")
 st.write("El reporte a utilizar corresponde a 'Resultados del periodo' e informe 'Completo'")
 
+if st.button("📚 Ver instructivo de descarga", help="Haz clic para ver cómo bajar el Excel de Balanz"):
+            mostrar_instructivo()
+st.divider()
+
 # --- Formulario de Carga ---
 with st.form(key="upload_form"):
-    
-    col_instrucciones, col_vacia = st.columns([1, 2])
-    with col_instrucciones:
-        if st.button("📚 Ver instructivo de descarga", help="Haz clic para ver cómo bajar el Excel de Balanz"):
-            mostrar_instructivo()
     
     # A. El cargador de archivos
     uploaded_file = st.file_uploader("1. Sube tu archivo (Excel)", type=["xlsx"])
@@ -451,6 +450,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
