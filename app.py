@@ -296,15 +296,17 @@ with st.form(key="upload_form"):
     st.info("Si aún no tienes credenciales, [crea tu cuenta gratuita en Supabase](https://supabase.com/dashboard/sign-up).")
     with st.expander("ℹ️ Ver instructivo: ¿Cómo obtengo estos datos?"):
         st.write("""
-        1. Entra a tu proyecto en Supabase.
-        2. Ve al icono de engranaje ⚙️ (**Settings**) en el menú izquierdo.
-        3. Haz clic en **Database**.
-        4. Baja hasta la sección **Connection parameters**.
+        1. Crea tu cuenta y proyecto en Supabase.
+        2. Entra a tu proyecto.
+        3. Ve al botón "Connect" que se encuentra en la parte superior de la pantalla:
+        st.image("captura_supabase.png", caption="Pantalla de configuración de Supabase", use_container_width=True)
+        4. Selecciona el Method "Session pooler":
+        st.image("captura_supabase_2.png", caption="Pantalla de configuración de Supabase", use_container_width=True)
+        4. Abre la opción "View parameters":
+        st.image("captura_supabase_3.png", caption="Pantalla de configuración de Supabase", use_container_width=True)
         5. Ahí encontrarás el **Host**, **Database name** y **User**.
         6. *Nota: La contraseña es la que creaste al iniciar el proyecto.*
         """)
-        # Si tienes una imagen del paso a paso en tu carpeta del proyecto:
-        # st.image("instrucciones_supabase.png")
     col1, col2 = st.columns(2)
     with col1:
         db_host = st.text_input("Host (Servidor)", placeholder="db.xxxxxxxx.supabase.co")
@@ -378,6 +380,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
