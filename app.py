@@ -8,6 +8,41 @@ from datetime import datetime, date
 from sqlalchemy import create_engine, MetaData, Table, Column, String, Date, Float, Integer, Text, text
 from sqlalchemy.pool import NullPool
 
+##INSTRUCTIVO PARA REPORTE DE BALANZ
+
+@st.dialog("📥 Cómo descargar el reporte de Balanz")
+def mostrar_instructivo():
+    st.markdown("""
+    Sigue estos pasos para obtener el reporte de Balanz:
+    
+    **1. Ingresa a Balanz**
+    Inicia sesión en tu cuenta desde la web.
+    """)
+    st.image("paso1.png", use_container_width=True)
+
+    st.markdown("""
+    **2. Ve a la sección de Reportes**
+    """)
+    st.image("paso2.png", use_container_width=True)
+    
+    st.markdown("""
+    **3. Configura el reporte**
+    Es muy importante que selecciones estas opciones exactas:
+    * **Reporte:** Resultados del período
+    * **Período:** Selecciona el rango de fechas (ej. Desde el inicio de tus inversiones hasta hoy).
+    * **Informe:** COMPLETO.
+    """)
+    st.image("paso3.png", use_container_width=True)
+    st.image("paso4.png", use_container_width=True)
+
+    st.markdown("""
+    **4. Descargar**
+    Haz clic en el botón **Descargarr**. Se descargará un archivo `.xlsx`.
+    
+    ---
+    ✅ **¡Listo!** Ahora cierra esta ventana y sube ese archivo en el paso 1.
+    """)
+
 if 'procesamiento_listo' not in st.session_state:
     st.session_state.procesamiento_listo = False
 if 'ultimo_mensaje' not in st.session_state:
@@ -311,6 +346,11 @@ st.write("El reporte a utilizar corresponde a 'Resultados del periodo' e informe
 # --- Formulario de Carga ---
 with st.form(key="upload_form"):
     
+    col_instrucciones, col_vacia = st.columns([1, 2])
+    with col_instrucciones:
+        if st.button("📚 Ver instructivo de descarga", help="Haz clic para ver cómo bajar el Excel de Balanz"):
+            mostrar_instructivo()
+    
     # A. El cargador de archivos
     uploaded_file = st.file_uploader("1. Sube tu archivo (Excel)", type=["xlsx"])
     
@@ -411,5 +451,6 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
