@@ -270,7 +270,7 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
                         st.write(f"Tabla '{table_name_dolar}' creada.")
                     except Exception as ex:
                         if "violates unique constraint" in str(ex) or "duplicate key value" in str(ex):
-                            st.warning(f"Datos del Dólar ya cargados el día de hoy")
+                            st.warning(f"Cotización del dólar ya cargada el día de hoy")
                         else:
                             st.error(f"Error SQL Dólar: {ex}")
             except Exception as e:
@@ -411,4 +411,5 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
