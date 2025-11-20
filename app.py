@@ -248,63 +248,47 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
                         st.warning(f"Advertencia: Datos ya cargados el día de hoy en '{table_name_hist}'.")
                     else:
                         raise ex
-        ## GUARDADO DE DATOS HISTORICOS DOLAR
+        except Exception as e:
+            raise e
 
-        # CREACION DE DATAFRAME CON VALOR DE DOLAR POR FECHA
+        ## GUARDADO DE DATOS HISTORICOS DOLAR
         
+        st.write("Guardando histórico del dólar...")
         if dolar_oficial and dolar_mep:
             datos_dolar = [
                 {'fecha': date.today(), 'tipo': 'Oficial', 'valor': dolar_oficial},
                 {'fecha': date.today(), 'tipo': 'MEP', 'valor': dolar_mep}
             ]
             df_historico_dolar = pd.DataFrame(datos_dolar)
-        
-            # CONEXION A SQL
-        
+
             try:
-                engine = create_engine(connection_url)
-                metadata = MetaData()
-                table_name = 'historico_dolar'
-        
-                # ESTRUCTURA DE LA TABLA
-        
+                engine_dolar = create_engine(connection_url, poolclass=NullPool)
+                metadata_dolar = MetaData()
+                table_name_dolar = 'historico_dolar'
+
                 historico_dolar_table = Table(
-                    table_name,
-                    metadata,
+                    table_name_dolar, metadata_dolar,
                     Column('fecha', Date, primary_key=True),
                     Column('tipo', String, primary_key=True),
                     Column('valor', Float)
                 )
-        
-                metadata.create_all(engine)
-        
-                # INSERCIÓN DE DATOS
-        
-                with engine.connect() as connection:
+                metadata_dolar.create_all(engine_dolar)
+
+                with engine_dolar.connect() as connection:
                     try:
-                        df_historico_dolar.to_sql(
-                            table_name,
-                            connection,
-                            if_exists='append',
-                            index=False
-                        )
+                        df_historico_dolar.to_sql(table_name_dolar, connection, if_exists='append', index=False)
                         st.success(f"Carga de datos de Dólar exitosa")
-        
                     except Exception as ex:
                         if "violates unique constraint" in str(ex) or "duplicate key value" in str(ex):
                             st.warning(f"Datos del Dólar ya cargados el día de hoy")
                         else:
-                            st.error(f"Error: {ex}")
+                            st.error(f"Error SQL Dólar: {ex}")
+            except Exception as e:
+                st.error(f"Error de conexión Dólar: {e}")
+        else:
+            st.error("No se pudieron obtener los valores del dólar para guardar.")
 
-    except Exception as e:
-        st.error(f"Error de conexión o estructura: {e}")
-else:
-    st.error("No se pudieron obtener los valores del dólar para guardar.")
-        
-        except Exception as e:
-            raise e
-        
-        # Si todo salió bien
+        # --- FINALIZACIÓN EXITOSA ---
         return True, "¡Proceso completado con éxito!"
 
     except Exception as e:
@@ -438,6 +422,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
