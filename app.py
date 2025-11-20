@@ -364,15 +364,15 @@ with st.form(key="upload_form"):
         2. Entra a tu proyecto.
         3. Ve al botón "Connect" que se encuentra en la parte superior de la pantalla:
         """)
-        # st.image("captura_supabase.png", use_container_width=True)
+        st.image("captura_supabase.png", use_container_width=True)
         st.write("""
         4. Selecciona el Method "Session pooler":
         """)
-        # st.image("captura_supabase_2.png", use_container_width=True)
+        st.image("captura_supabase_2.png", use_container_width=True)
         st.write("""
         5. Abre la opción "View parameters":
         """)
-        # st.image("captura_supabase_3.png", use_container_width=True)
+        st.image("captura_supabase_3.png", use_container_width=True)
         st.write("""
         6. Ahí encontrarás el **Host**, **Database name** y **User**.
         7. *Nota: La contraseña es la que creaste al iniciar el proyecto.*
@@ -450,6 +450,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
