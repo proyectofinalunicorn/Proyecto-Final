@@ -4,8 +4,8 @@ import yfinance as yf
 import requests
 import streamlit as st
 import os
-from datetime import datetime
-from sqlalchemy import create_engine, MetaData, Table, Column, String, Date, Float, Integer, Text, text, PrimaryKeyConstraint
+from datetime import datetime, date
+from sqlalchemy import create_engine, MetaData, Table, Column, String, Date, Float, Integer, Text, text
 from sqlalchemy.pool import NullPool
 
 if 'procesamiento_listo' not in st.session_state:
@@ -15,7 +15,7 @@ if 'ultimo_mensaje' not in st.session_state:
 
 def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass):
     try:
-        ##IMPORTACION DE BASE DE DATOS
+        ## IMPORTACION DE BASE DE DATOS
         st.write(f"Leyendo archivo: {archivo_subido.name}...")
         if archivo_subido.name.endswith(('.xlsx')):
             df = pd.read_excel(archivo_subido, sheet_name="resultados_por_lotes_finales")
@@ -23,18 +23,18 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
             st.error("Error: Formato de archivo no soportado.")
             return False, "Error de archivo"
 
-        ##RENOMBRAR COLUMNAS
+        ## RENOMBRAR COLUMNAS
         df.rename(columns = {"Cantidad": "cantidad", "Descripcion": "descripcion", "Fecha": "fecha", "Fecha Lote": "fecha_descarga", "Gastos": "gastos", "Moneda": "moneda", "Operacion": "operacion", "Precio Compra": "precio_compra", "Ticker": "ticker", "Tipo": "tipo", "DolarCCL": "dolar_ccl", "DolarMEP": "dolar_mep", "DolarOficial": "dolar_oficial"}, inplace = True)
 
-        ##ELIMINACIÓN DE COLUMNAS INNECESARIAS
+        ## ELIMINACIÓN DE COLUMNAS INNECESARIAS
         columnas_a_borrar = ["dolar_ccl", "operacion"]
         columnas_existentes = [col for col in columnas_a_borrar if col in df.columns]
         df.drop(columnas_existentes, axis=1, inplace=True)
 
-        ##FILTRO DE DATOS POR TIPO DE ACTIVO
+        ## FILTRO DE DATOS POR TIPO DE ACTIVO
         df_cedears = df[df.tipo == "Cedears"].copy()
 
-        ##CAMBIO DE TIPO DE DATO A FECHA
+        ## CAMBIO DE TIPO DE DATO A FECHA
         df_cedears.fecha = pd.to_datetime(df_cedears.fecha)
         df_cedears.fecha_descarga = pd.to_datetime(df_cedears.fecha_descarga)
         
@@ -43,12 +43,12 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
             df_cedears.sort_values(by="fecha", inplace=True)
             df_cedears.reset_index(drop=True, inplace=True)
         else:
-            print("Error: No se pudo ordenar por fecha")
+            st.warning("Error: No se pudo ordenar por fecha")
 
-        ##CALCULO DE COSTO EN PESOS ARGENTINOS
+        ## CALCULO DE COSTO EN PESOS ARGENTINOS
         df_cedears["costo_ars"] = (df_cedears.cantidad * df_cedears.precio_compra)+df_cedears.gastos
 
-        ##CALCULO DE COSTO EN USD (SEGÚN FECHA)
+        ## CALCULO DE COSTO EN USD (SEGÚN FECHA)
         df_cedears["costo_usd"] = np.where(
             df_cedears.fecha < pd.to_datetime("2025-04-15"),
             df_cedears.costo_ars / df_cedears.dolar_mep,
@@ -116,7 +116,7 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
         df_cedears["rendimiento_usd"] = round((df_cedears.tenencia_usd / df_cedears.costo_usd - 1) * 100, 2)
 
         ## AGRUPACION DE ACCIONES Y TOTALES
-        df_cedears_analisis = df_cedears[["ticker", "cantidad", "costo_ars","costo_usd","tenencia_ars",	"tenencia_usd", "resultados_ars",	"resultados_usd"]]
+        df_cedears_analisis = df_cedears[["ticker", "cantidad", "costo_ars","costo_usd","tenencia_ars", "tenencia_usd", "resultados_ars", "resultados_usd"]]
         df_cedears_agrupado = df_cedears_analisis.groupby("ticker").sum().round(2)
         df_cedears_agrupado["rendimiento_ars"] = df_cedears_agrupado["resultados_ars"] / df_cedears_agrupado["costo_ars"]
         df_cedears_agrupado["rendimiento_usd"] = df_cedears_agrupado["resultados_usd"] / df_cedears_agrupado["costo_usd"]
@@ -149,16 +149,10 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
 
         ## DATOS DE CONEXION A SUPABASE (SQL)
         st.write("Conectando a la base de datos...")
-        user = db_user
-        password = db_pass
-        database = db_name
-        pooler_host = db_host
-        pooler_port = '5432'
+        
+        connection_url = f'postgresql+psycopg2://{db_user}:{db_pass}@{db_host}:5432/{db_name}?sslmode=require'
 
-        ## GUARDADO DE DF_CEDEARS CON PRIMARYKEY EN SUPABASE (SQL)
-        # CONEXION A SQL
-        connection_url = f'postgresql+psycopg2://{user}:{password}@{pooler_host}:{pooler_port}/{database}?sslmode=require'
-
+        # --- 1. GUARDADO DE DF_CEDEARS CON PRIMARYKEY EN SUPABASE (SQL) ---
         try:
             engine = create_engine(connection_url, poolclass=NullPool)
             with engine.begin() as connection:
@@ -190,7 +184,7 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
                     Column('rendimiento_usd', Float)
                 )
                 metadata.create_all(engine)
-                st.write(f"Tabla '{table_name}' creada.")
+                st.write(f"Tabla '{table_name}' verificada.")
 
                 # ELIMINACION DE DATOS
                 connection.execute(text(f"TRUNCATE TABLE {table_name} RESTART IDENTITY;"))
@@ -204,12 +198,9 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
         except Exception as e:
             raise e
 
-        ## GUARDADO DE DATOS HISTORICOS CEDEARS
-        # CONEXION A SQL
-        connection_url_hist = f'postgresql+psycopg2://{user}:{password}@{pooler_host}:{pooler_port}/{database}?sslmode=require'
-
+        # --- 2. GUARDADO DE DATOS HISTORICOS CEDEARS ---
         try:
-            engine_hist = create_engine(connection_url_hist, poolclass=NullPool)
+            engine_hist = create_engine(connection_url, poolclass=NullPool)
             # ESTRUCTURA DE LA TABLA
             metadata_hist = MetaData()
             table_name_hist = 'datos_historicos_cedears'
@@ -228,7 +219,7 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
             # Drop and recreate the table to ensure schema is updated
             metadata_hist.drop_all(engine_hist)
             metadata_hist.create_all(engine_hist)
-            st.write(f"Tabla '{table_name_hist}' creada.")
+            st.write(f"Tabla '{table_name_hist}' recreada.")
 
             with engine_hist.connect() as connection:
                 # INSERCIÓN DE DATOS
@@ -248,12 +239,10 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
                         st.warning(f"Advertencia: Datos ya cargados el día de hoy en '{table_name_hist}'.")
                     else:
                         raise ex
-
         except Exception as e:
-            raise e
+             raise e
 
-        ## GUARDADO DE DATOS HISTORICOS DOLAR
-        
+        # --- 3. GUARDADO DE DATOS HISTORICOS DOLAR ---
         st.write("Guardando histórico del dólar...")
         if dolar_oficial and dolar_mep:
             datos_dolar = [
@@ -296,7 +285,6 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
         error_message = str(e).lower() 
         
         if "authentication failed" in error_message or "connection to server" in error_message or "duplicate sasl authentication" in error_message:
-            
             return False, "❌ ¡Error de conexión! Revisa tu Host, Usuario, Contraseña y Nombre de Base de Datos."
 
         elif "worksheet named" in error_message and "not found" in error_message:
@@ -337,15 +325,15 @@ with st.form(key="upload_form"):
         2. Entra a tu proyecto.
         3. Ve al botón "Connect" que se encuentra en la parte superior de la pantalla:
         """)
-        st.image("captura_supabase.png", use_container_width=True)
+        # st.image("captura_supabase.png", use_container_width=True)
         st.write("""
         4. Selecciona el Method "Session pooler":
         """)
-        st.image("captura_supabase_2.png", use_container_width=True)
+        # st.image("captura_supabase_2.png", use_container_width=True)
         st.write("""
         5. Abre la opción "View parameters":
         """)
-        st.image("captura_supabase_3.png", use_container_width=True)
+        # st.image("captura_supabase_3.png", use_container_width=True)
         st.write("""
         6. Ahí encontrarás el **Host**, **Database name** y **User**.
         7. *Nota: La contraseña es la que creaste al iniciar el proyecto.*
@@ -412,7 +400,7 @@ if submit_button:
                     use_container_width=True
                 )
             else:
-                st.error(f"Error de configuración: No se encontró el archivo '{template_file_name}' en el servidor.")
+                # st.error(f"Error de configuración: No se encontró el archivo '{template_file_name}' en el servidor.")
                 st.warning("Asegúrate de haber subido el archivo .pbit a la carpeta de la aplicación.")
                 st.session_state.procesamiento_listo = False
                 
@@ -423,39 +411,3 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
