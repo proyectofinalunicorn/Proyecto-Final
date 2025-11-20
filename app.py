@@ -249,6 +249,9 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
                     else:
                         raise ex
 
+        except Exception as e:
+            raise e
+
         ## GUARDADO DE DATOS HISTORICOS DOLAR
         
         st.write("Guardando histórico del dólar...")
@@ -420,6 +423,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
