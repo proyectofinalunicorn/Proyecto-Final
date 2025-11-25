@@ -51,6 +51,9 @@ if 'ultimo_mensaje' not in st.session_state:
 
 def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass):
     try:
+
+        barra_progreso = st.progress(0, text="Iniciando:")
+        
         ## IMPORTACION DE BASE DE DATOS
         st.write(f"Leyendo archivo: {archivo_subido.name}...")
         if archivo_subido.name.endswith(('.xlsx')):
@@ -119,6 +122,8 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
 
         if error_cotizaciones:
             return False, "Error al obtener las cotizaciones. Proceso detenido."
+
+        barra_progreso.progress(0.70, text="Cotizaciones obtenidas.")
 
         ## CALCULO DE TENENCIA TOTAL ACTUALIZADA EN PESOS ARGENTINOS
         df_cedears["tenencia_ars"] = (df_cedears.cantidad * df_cedears.ticker.map(cotizacion_actual).fillna(0))*(1-0.006)
@@ -190,6 +195,8 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
         except Exception as e:
             st.error(f"Error en wide_to_long: {e}")
             raise e
+
+        barra_progreso.progress(0.85, text="Guardando en Base de Datos...")
 
         ## DATOS DE CONEXION A SUPABASE (SQL)
         st.write("Conectando a la base de datos...")
@@ -323,6 +330,7 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
             st.error("No se pudieron obtener los valores del dólar para guardar.")
 
         # --- FINALIZACIÓN EXITOSA ---
+        barra_progreso.progress(1.0)
         return True, "¡Proceso completado con éxito!"
 
     except Exception as e:
@@ -459,6 +467,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
