@@ -4,6 +4,7 @@ import yfinance as yf
 import requests
 import streamlit as st
 import os
+import time
 from datetime import datetime, date
 from sqlalchemy import create_engine, MetaData, Table, Column, String, Date, Float, Integer, Text, text
 from sqlalchemy.pool import NullPool
@@ -108,6 +109,8 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
                 else:
                     precio = ticker_obj.fast_info["last_price"]
                 cotizacion_actual[ticker] = precio
+
+                time.sleep(1)
             except Exception as e:
                 st.warning(f"Error al obtener la cotización de {ticker}: {e}")
 
@@ -251,8 +254,8 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
                 Column('resultados', Float),
                 Column('rendimiento', Float)
             )
-            # Drop and recreate the table to ensure schema is updated
-            metadata_hist.drop_all(engine_hist)
+
+        
             metadata_hist.create_all(engine_hist)
             st.write(f"Tabla '{table_name_hist}' creada.")
 
@@ -450,6 +453,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
