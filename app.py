@@ -109,7 +109,7 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
         barra_progreso.progress(0.10)
         total_tickers = len(tickers_unicos)    
         
-      for i, ticker in enumerate(tickers_unicos):
+        for i, ticker in enumerate(tickers_unicos):
             ticker_argentina = ticker + ".BA"
             try:
                 ticker_obj = yf.Ticker(ticker_argentina)
@@ -475,6 +475,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
