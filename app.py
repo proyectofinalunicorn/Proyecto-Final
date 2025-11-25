@@ -120,7 +120,7 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
                     precio = ticker_obj.fast_info["last_price"]
                 cotizacion_actual[ticker] = precio
 
-                time.sleep(1)
+                time.sleep(0.5)
             except Exception as e:
                 st.warning(f"Error al obtener la cotización de {ticker}: {e}")
                 error_cotizaciones = True
@@ -131,7 +131,6 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
         if error_cotizaciones:
             return False, "Error al obtener las cotizaciones. Proceso detenido."
 
-        barra_progreso.progress(0.70, text="Cotizaciones obtenidas.")
 
         ## CALCULO DE TENENCIA TOTAL ACTUALIZADA EN PESOS ARGENTINOS
         df_cedears["tenencia_ars"] = (df_cedears.cantidad * df_cedears.ticker.map(cotizacion_actual).fillna(0))*(1-0.006)
@@ -156,6 +155,8 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
         dolar_oficial, dolar_mep = obtener_valores_dolar()
         if dolar_oficial is None or dolar_mep is None:
             raise Exception("No se pudo obtener el valor del dólar, el proceso no puede continuar.")
+
+        barra_progreso.progress(0.70, text="Cotizaciones obtenidas.")
 
         ## CALCULO DE TENENCIA TOTAL ACTUALIZADA EN USD (utilizando el tipo de cambio mas bajo)
         df_cedears["tenencia_usd"] = df_cedears.tenencia_ars / np.minimum(dolar_oficial, dolar_mep)
@@ -475,6 +476,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
