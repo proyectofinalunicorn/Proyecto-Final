@@ -98,6 +98,8 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
         cotizacion_actual = {}
         st.write("Obteniendo cotizaciones...")
 
+        error_cotizaciones = False
+
         ## COTIZACION ACTUALIZADA
         for ticker in tickers_unicos:
             ticker_argentina = ticker + ".BA"
@@ -113,6 +115,10 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
                 time.sleep(1)
             except Exception as e:
                 st.warning(f"Error al obtener la cotización de {ticker}: {e}")
+                error_cotizaciones = True
+
+        if error_cotizaciones:
+            return False, "Error al obtener las cotizaciones. Proceso detenido."
 
         ## CALCULO DE TENENCIA TOTAL ACTUALIZADA EN PESOS ARGENTINOS
         df_cedears["tenencia_ars"] = (df_cedears.cantidad * df_cedears.ticker.map(cotizacion_actual).fillna(0))*(1-0.006)
@@ -453,6 +459,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
