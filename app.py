@@ -258,6 +258,8 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
         except Exception as e:
             raise e
 
+        barra_progreso.progress(0.90, text="Guardando en Base de Datos...")
+
         # --- 2. GUARDADO DE DATOS HISTORICOS CEDEARS ---
         try:
             engine_hist = create_engine(connection_url, poolclass=NullPool)
@@ -276,7 +278,6 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
                 Column('resultados', Float),
                 Column('rendimiento', Float)
             )
-
         
             metadata_hist.create_all(engine_hist)
             st.write(f"Tabla '{table_name_hist}' creada.")
@@ -301,6 +302,9 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
                         raise ex
         except Exception as e:
              raise e
+
+        barra_progreso.progress(0.95, text="Guardando en Base de Datos...")
+        
 
         # --- 3. GUARDADO DE DATOS HISTORICOS DOLAR ---
         st.write("Guardando histórico del dólar...")
@@ -476,6 +480,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
