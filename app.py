@@ -396,7 +396,7 @@ with st.form(key="upload_form"):
         """)
     col1, col2 = st.columns(2)
     with col1:
-        db_host = st.text_input("Host (Servidor)", placeholder="db.xxxxxxxx.supabase.co")
+        db_host = st.text_input("Host (Servidor)", placeholder="aws.xxxxxxxx.supabase.com")
         db_user = st.text_input("Usuario")
     with col2:
         db_name = st.text_input("Nombre de la Base de Datos", "postgres")
@@ -467,6 +467,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
