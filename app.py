@@ -205,7 +205,7 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
             st.error(f"Error en wide_to_long: {e}")
             raise e
 
-        barra_progreso.progress(0.85, text="Guardando en Base de Datos...")
+        barra_progreso.progress(0.80, text="Guardando en Base de Datos...")
 
         ## DATOS DE CONEXION A SUPABASE (SQL)
         st.write("Conectando a la base de datos...")
@@ -258,7 +258,7 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
         except Exception as e:
             raise e
 
-        barra_progreso.progress(0.90, text="Guardando en Base de Datos...")
+        barra_progreso.progress(0.85, text="Guardando en Base de Datos...")
 
         # --- 2. GUARDADO DE DATOS HISTORICOS CEDEARS ---
         try:
@@ -303,7 +303,7 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
         except Exception as e:
              raise e
 
-        barra_progreso.progress(0.95, text="Guardando en Base de Datos...")
+        barra_progreso.progress(0.90, text="Guardando en Base de Datos...")
         
 
         # --- 3. GUARDADO DE DATOS HISTORICOS DOLAR ---
@@ -341,6 +341,8 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
                 st.error(f"Error de conexión Dólar: {e}")
         else:
             st.error("No se pudieron obtener los valores del dólar para guardar.")
+
+        barra_progreso.progress(0.95, text="Guardando en Base de Datos...")
 
         # --- FINALIZACIÓN EXITOSA ---
         barra_progreso.progress(1.0)
@@ -480,6 +482,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
