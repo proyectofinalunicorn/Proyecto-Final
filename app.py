@@ -407,7 +407,7 @@ with st.form(key="upload_form"):
         st.image("captura_supabase_3.png", use_container_width=True)
         st.write("""
         6. Ahí encontrarás el **Host**, **Database name** y **User**.
-        7. *Nota: La contraseña es la que creaste al iniciar el proyecto. Para modificarla podes ingresar a "Database Settings" desde la parte inferior de la pantalla*
+        7. *Nota: La contraseña es la que creaste al iniciar el proyecto. Para modificarla podes ingresar a "Database Settings" desde la parte inferior de la pantalla.*
         """)
     col1, col2 = st.columns(2)
     with col1:
@@ -482,6 +482,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
