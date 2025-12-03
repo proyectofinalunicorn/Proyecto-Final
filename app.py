@@ -483,7 +483,7 @@ if submit_button:
         except Exception as e:
                 st.error(f"❌ Error en las credenciales de Supabase")
             
-            st.stop() # <--- ¡AQUÍ SE FRENA SI ESTÁ MAL! NO SIGUE.
+                st.stop() # <--- ¡AQUÍ SE FRENA SI ESTÁ MAL! NO SIGUE.
         
         # Muestra el "spinner" mientras la función se ejecuta
         with st.spinner('Procesando archivo y conectando a Supabase... Esto puede tardar varios segundos...'):
@@ -534,6 +534,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
