@@ -49,6 +49,38 @@ if 'procesamiento_listo' not in st.session_state:
 if 'ultimo_mensaje' not in st.session_state:
     st.session_state.ultimo_mensaje = ""
 
+from sqlalchemy import create_engine, text
+import streamlit as st
+
+# ... tus inputs de usuario/contraseña ...
+# ... tu armado del string: connection_url_hist = ...
+
+if st.button("Iniciar Proceso"):
+
+    # --- VALIDACIÓN DE CONEXIÓN PURA (PING) ---
+    try:
+        # 1. Creamos un motor temporal solo para el test
+        # (poolclass=NullPool asegura que se cierre la conexión inmediatamente después)
+        engine_test = create_engine(connection_url_hist, poolclass=NullPool)
+        
+        # 2. Intentamos conectar y ejecutar "SELECT 1"
+        with engine_test.connect() as conn:
+            conn.execute(text("SELECT 1"))
+            
+        # Si llegamos acá, la conexión es válida.
+        # No hace falta "cerrar" explícitamente gracias al 'with'
+        
+    except Exception as e:
+        # Aquí capturamos el error de conexión (password mal, host mal, etc.)
+        st.error("❌ No se pudo establecer la conexión con la Base de Datos.")
+        st.error("Por favor revisa: Usuario, Contraseña, Host y Puerto.")
+        # Opcional: mostrar el error técnico
+        with st.expander("Ver detalle del error técnico"):
+            st.write(e)
+            
+        st.stop() # <--- Frena todo aquí.
+
+
 def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass):
     try:
 
@@ -432,6 +464,35 @@ if submit_button:
     
     # Verificamos que todos los campos estén completos
     if uploaded_file is not None and db_host and db_name and db_user and db_pass:
+
+        try:
+            from sqlalchemy import create_engine, text # Importación necesaria
+            
+            # Construimos la URL temporal. 
+            # NOTA: Supabase suele usar puerto 5432 (directo) o 6543 (pooler). 
+            # Si tu db_host no incluye puerto, aquí forzamos el 5432 estándar.
+            url_check = f"postgresql+psycopg2://{db_user}:{db_pass}@{db_host}:5432/{db_name}?sslmode=require"
+            
+            # Prueba silenciosa "SELECT 1"
+            engine_check = create_engine(url_check)
+            with engine_check.connect() as conn:
+                conn.execute(text("SELECT 1"))
+                
+            # SI LLEGA ACÁ, LA CONEXIÓN ES CORRECTA -> SIGUE BAJANDO EN SILENCIO
+
+        except Exception as e:
+            # SI FALLA, MOSTRAMOS ERROR Y PARAMOS TODO
+            err_msg = str(e).lower()
+            if "authentication failed" in err_msg or "password" in err_msg:
+                st.error("❌ Error de autenticación: Contraseña o Usuario incorrectos.")
+            elif "could not translate host name" in err_msg:
+                st.error("❌ Error de Host: No se encuentra el servidor (revisa el 'db_host').")
+            elif "database" in err_msg and "does not exist" in err_msg:
+                st.error(f"❌ La base de datos '{db_name}' no existe.")
+            else:
+                st.error(f"❌ Error de conexión: {e}")
+            
+            st.stop() # <--- ¡AQUÍ SE FRENA SI ESTÁ MAL! NO SIGUE.
         
         # Muestra el "spinner" mientras la función se ejecuta
         with st.spinner('Procesando archivo y conectando a Supabase... Esto puede tardar varios segundos...'):
@@ -482,6 +543,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
