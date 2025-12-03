@@ -49,37 +49,6 @@ if 'procesamiento_listo' not in st.session_state:
 if 'ultimo_mensaje' not in st.session_state:
     st.session_state.ultimo_mensaje = ""
 
-from sqlalchemy import create_engine, text
-import streamlit as st
-
-# ... tus inputs de usuario/contraseña ...
-# ... tu armado del string: connection_url_hist = ...
-
-if st.button("Iniciar Proceso"):
-
-    # --- VALIDACIÓN DE CONEXIÓN PURA (PING) ---
-    try:
-        # 1. Creamos un motor temporal solo para el test
-        # (poolclass=NullPool asegura que se cierre la conexión inmediatamente después)
-        engine_test = create_engine(connection_url_hist, poolclass=NullPool)
-        
-        # 2. Intentamos conectar y ejecutar "SELECT 1"
-        with engine_test.connect() as conn:
-            conn.execute(text("SELECT 1"))
-            
-        # Si llegamos acá, la conexión es válida.
-        # No hace falta "cerrar" explícitamente gracias al 'with'
-        
-    except Exception as e:
-        # Aquí capturamos el error de conexión (password mal, host mal, etc.)
-        st.error("❌ No se pudo establecer la conexión con la Base de Datos.")
-        st.error("Por favor revisa: Usuario, Contraseña, Host y Puerto.")
-        # Opcional: mostrar el error técnico
-        with st.expander("Ver detalle del error técnico"):
-            st.write(e)
-            
-        st.stop() # <--- Frena todo aquí.
-
 
 def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass):
     try:
@@ -534,6 +503,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
