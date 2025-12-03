@@ -481,16 +481,7 @@ if submit_button:
             # SI LLEGA ACÁ, LA CONEXIÓN ES CORRECTA -> SIGUE BAJANDO EN SILENCIO
 
         except Exception as e:
-            # SI FALLA, MOSTRAMOS ERROR Y PARAMOS TODO
-            err_msg = str(e).lower()
-            if "authentication failed" in err_msg or "password" in err_msg:
-                st.error("❌ Error de autenticación: Contraseña o Usuario incorrectos.")
-            elif "could not translate host name" in err_msg:
-                st.error("❌ Error de Host: No se encuentra el servidor (revisa el 'db_host').")
-            elif "database" in err_msg and "does not exist" in err_msg:
-                st.error(f"❌ La base de datos '{db_name}' no existe.")
-            else:
-                st.error(f"❌ Error de conexión: {e}")
+                st.error(f"❌ Error en las credenciales de Supabase")
             
             st.stop() # <--- ¡AQUÍ SE FRENA SI ESTÁ MAL! NO SIGUE.
         
@@ -543,6 +534,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
