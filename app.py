@@ -371,6 +371,7 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
 # -----------------------------------------------------------------
 # 2. LA INTERFAZ WEB (EL FRONT-END)
 # -----------------------------------------------------------------
+st.image("logo.png", use_container_width=True)
 st.set_page_config(layout="centered", page_title="Análisis de inversiones")
 st.title("💰 Análisis de inversiones")
 st.write("Sube tu reporte de Balanz y completa los datos de tu Base de Datos de Supabase (PostgreSQL).")
@@ -503,6 +504,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
