@@ -479,41 +479,36 @@ if submit_button:
             
             # Nombre de tu plantilla. DEBE estar en la misma carpeta que este script.
             template_file_name = "Plantilla_PowerBI.pbit" 
-            
-            # Verificamos si el archivo existe antes de mostrar el botón
-            if os.path.exists(template_file_name):
-                with open(template_file_name, "rb") as f:
-                    file_data = f.read()
                 
-                st.download_button(
-                    label="📥 Descargar Plantilla de Power BI (.pbit)",
-                    data=file_data,
-                    file_name=template_file_name,
-                    mime="application/vnd.ms-powerbi.template",
-                    use_container_width=True
-                )
+            st.download_button(
+                label="📥 Descargar Plantilla de Power BI (.pbit)",
+                data=file_data,
+                file_name=template_file_name,
+                mime="application/vnd.ms-powerbi.template",
+                use_container_width=True
+            )
 
-                with st.expander("ℹ️ Solución de error en Power BI":):
-                    st.write("""
-                    1. En caso de presentar el siguiente error deberás seguir los pasos detallados a continuación:
-                    """)
-                    st.image("error1.png", use_container_width=True)
-                    st.write("""
-                    2. Ingresa a "Archivo", "Opciones y Configuración", y posteriormente a "Configuración de origen de datos":
-                    """)
-                    st.image("error2.png", use_container_width=True)
-                    st.write("""
-                    3. Selecciona "Editar permisos":
-                    """)
-                    st.image("error3.png", use_container_width=True)
-                    st.write("""
-                    4. Destilda la opción "Cifrar conexiones":
-                    """)
-                    st.image("error4.png", use_container_width=True)
-                    st.write("""
-                    5. Por último, selecciona "Actualizar" en la pantalla de Inicio para obtener los datos:
-                    """)
-                    st.image("error5.png", use_container_width=True)
+            with st.expander("ℹ️ Solución de error en Power BI":):
+                st.write("""
+                1. En caso de presentar el siguiente error deberás seguir los pasos detallados a continuación:
+                """)
+                st.image("error1.png", use_container_width=True)
+                st.write("""
+                2. Ingresa a "Archivo", "Opciones y Configuración", y posteriormente a "Configuración de origen de datos":
+                """)
+                st.image("error2.png", use_container_width=True)
+                st.write("""
+                3. Selecciona "Editar permisos":
+                """)
+                st.image("error3.png", use_container_width=True)
+                st.write("""
+                4. Destilda la opción "Cifrar conexiones":
+                """)
+                st.image("error4.png", use_container_width=True)
+                st.write("""
+                5. Por último, selecciona "Actualizar" en la pantalla de Inicio para obtener los datos:
+                """)
+                st.image("error5.png", use_container_width=True)
 
 
             
@@ -529,6 +524,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
