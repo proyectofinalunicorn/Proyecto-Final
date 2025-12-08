@@ -488,7 +488,7 @@ if submit_button:
                 use_container_width=True
             )
 
-            with st.expander("ℹ️ Solución de error en Power BI":):
+            with st.expander("ℹ️ Solución de error en Power BI:")
                 st.write("""
                 1. En caso de presentar el siguiente error deberás seguir los pasos detallados a continuación:
                 """)
@@ -524,6 +524,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
