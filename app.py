@@ -478,10 +478,12 @@ if submit_button:
             st.write("El siguiente paso es descargar tu plantilla de Power BI. Ábrela, introduce tus credenciales de Supabase (las mismas que usaste aquí) y haz clic en 'Actualizar'.")
             
             # Nombre de tu plantilla. DEBE estar en la misma carpeta que este script.
-            template_file_name = "Plantilla_PowerBI.pbit" 
+            template_file_name = "Reporte de inversiones - Power BI.pbit" 
+            with open(template_file_name, "rb") as f:
+                file_data = f.read()
                 
             st.download_button(
-                label="📥 Descargar Plantilla de Power BI (.pbit)",
+                label="📥 Descargar el informe de Power BI",
                 data=file_data,
                 file_name=template_file_name,
                 mime="application/vnd.ms-powerbi.template",
@@ -517,6 +519,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
