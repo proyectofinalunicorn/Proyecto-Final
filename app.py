@@ -492,6 +492,31 @@ if submit_button:
                     mime="application/vnd.ms-powerbi.template",
                     use_container_width=True
                 )
+
+                with st.expander("ℹ️ Solución de error en Power BI":):
+                    st.write("""
+                    1. En caso de presentar el siguiente error deberás seguir los pasos detallados a continuación:
+                    """)
+                    st.image("error1.png", use_container_width=True)
+                    st.write("""
+                    2. Ingresa a "Archivo", "Opciones y Configuración", y posteriormente a "Configuración de origen de datos":
+                    """)
+                    st.image("error2.png", use_container_width=True)
+                    st.write("""
+                    3. Selecciona "Editar permisos":
+                    """)
+                    st.image("error3.png", use_container_width=True)
+                    st.write("""
+                    4. Destilda la opción "Cifrar conexiones":
+                    """)
+                    st.image("error4.png", use_container_width=True)
+                    st.write("""
+                    5. Por último, selecciona "Actualizar" en la pantalla de Inicio para obtener los datos:
+                    """)
+                    st.image("error5.png", use_container_width=True)
+
+
+            
             else:
                 # st.error(f"Error de configuración: No se encontró el archivo '{template_file_name}' en el servidor.")
                 st.warning("Asegúrate de haber subido el archivo .pbit a la carpeta de la aplicación.")
@@ -504,6 +529,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
