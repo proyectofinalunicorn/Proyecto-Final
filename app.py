@@ -509,13 +509,6 @@ if submit_button:
                 5. Por último, selecciona "Actualizar" en la pantalla de Inicio para obtener los datos:
                 """)
                 st.image("error5.png", use_container_width=True)
-
-
-            
-            else:
-                # st.error(f"Error de configuración: No se encontró el archivo '{template_file_name}' en el servidor.")
-                st.warning("Asegúrate de haber subido el archivo .pbit a la carpeta de la aplicación.")
-                st.session_state.procesamiento_listo = False
                 
         else:
             # Si 'exito' es False, muestra el mensaje de error
@@ -524,6 +517,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
