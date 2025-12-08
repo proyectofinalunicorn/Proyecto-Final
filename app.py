@@ -121,7 +121,7 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
                     precio = ticker_obj.fast_info["last_price"]
                 cotizacion_actual[ticker] = precio
 
-                time.sleep(0.5)
+                time.sleep(0.8)
             except Exception as e:
                 st.warning(f"Error al obtener la cotización de {ticker}: {e}")
                 error_cotizaciones = True
@@ -504,6 +504,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
