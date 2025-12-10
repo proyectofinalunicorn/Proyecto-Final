@@ -1,3 +1,4 @@
+## IMPORTACION DE BIBLIOTECAS
 import pandas as pd
 import numpy as np
 import yfinance as yf
@@ -451,35 +452,28 @@ with st.form(key="upload_form"):
 ## EJECUCIÓN DEL CÓDIGO AL INICIAR EL PROCESO
 if submit_button:
 
+    ## ACTUALIZACIÓN DE VARIABLE DE CONTROL 
     st.session_state.procesamiento_listo = False
     
-    # Verificamos que todos los campos estén completos
+    ## VERIFICA QUE LOS CAMPOS HAYAN SIDO COMPLETADOS
     if uploaded_file is not None and db_host and db_name and db_user and db_pass:
 
-        try:
-            from sqlalchemy import create_engine, text # Importación necesaria
-            
-            # Construimos la URL temporal. 
-            # NOTA: Supabase suele usar puerto 5432 (directo) o 6543 (pooler). 
-            # Si tu db_host no incluye puerto, aquí forzamos el 5432 estándar.
+        ## COMPRUEBA LA CONEXIÓN A SQL 
+        try:            
             url_check = f"postgresql+psycopg2://{db_user}:{db_pass}@{db_host}:5432/{db_name}?sslmode=require"
-            
-            # Prueba silenciosa "SELECT 1"
             engine_check = create_engine(url_check)
             with engine_check.connect() as conn:
                 conn.execute(text("SELECT 1"))
                 
-            # SI LLEGA ACÁ, LA CONEXIÓN ES CORRECTA -> SIGUE BAJANDO EN SILENCIO
-
+        ## SI LA CONEXIÓN FALLA DETIENE EL PROCESO
         except Exception as e:
                 st.error(f"❌ Error en las credenciales de Supabase")
-            
-                st.stop() # <--- ¡AQUÍ SE FRENA SI ESTÁ MAL! NO SIGUE.
+                st.stop()
         
-        # Muestra el "spinner" mientras la función se ejecuta
+        ## ACTUALIZACIÓN DE PROCESO
         with st.spinner('Procesando archivo y conectando a Supabase... Esto puede tardar varios segundos...'):
             
-            # Llama a tu función de lógica
+            ## EJECUCIÓN DE LA FUNCION PRINCIPAL
             exito, mensaje = procesar_y_guardar_en_sql(
                 uploaded_file, 
                 db_host, 
@@ -488,21 +482,18 @@ if submit_button:
                 db_pass
             )
         
-        # Muestra el resultado
+        ## RESULTADO EXITOSO
         if exito:
             st.session_state.procesamiento_listo = True
             st.session_state.ultimo_mensaje = mensaje
             st.success(mensaje)
             
-            # --- 3. BOTÓN DE DESCARGA DE POWER BI ---
+            ## BOTÓN DE DESCARGA DEL INFORME DE POWER BI
             st.subheader("¡Tus datos están listos!")
             st.write("El siguiente paso es descargar tu plantilla de Power BI. Ábrela, introduce tus credenciales de Supabase (las mismas que usaste aquí) y haz clic en 'Actualizar'.")
-            
-            # Nombre de tu plantilla. DEBE estar en la misma carpeta que este script.
             template_file_name = "Reporte de inversiones - Power BI.pbit" 
             with open(template_file_name, "rb") as f:
                 file_data = f.read()
-                
             st.download_button(
                 label="📥 Descargar el informe de Power BI",
                 data=file_data,
@@ -511,6 +502,7 @@ if submit_button:
                 use_container_width=True
             )
 
+            ## INSTRUCTIVO PARA SOLUCIONAR POSIBLE ERROR DENTRO DE POWER BI
             with st.expander("ℹ️ Solución de error en Power BI:"):
                 st.write("""
                 1. En caso de presentar el siguiente error deberás seguir los pasos detallados a continuación:
@@ -533,13 +525,13 @@ if submit_button:
                 """)
                 st.image("error5.png", use_container_width=True)
                 
+     ## MENSAJES DE ERROR ANTE FALLA EN EL PROCESO           
         else:
-            # Si 'exito' es False, muestra el mensaje de error
             st.error(mensaje)
             
     else:
-        # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
