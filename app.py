@@ -463,7 +463,8 @@ with st.form(key="upload_form"):
         use_container_width=True
     )
 
-## EJECUCIÓN DEL CÓDIGO AL INICIAR EL PROCESO
+## ------------------------------------------------------------------------------------------------------------------------------------------------------
+## EJECUCIÓN DEL CÓDIGO AL PRESIONAR EL BOTÓN
 if submit_button:
 
     ## ACTUALIZACIÓN DE VARIABLE DE CONTROL 
@@ -545,6 +546,7 @@ if submit_button:
             
     else:
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
