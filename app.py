@@ -434,7 +434,7 @@ with st.form(key="upload_form"):
         2. Entra a tu proyecto.
         3. Ve al botón "Connect" que se encuentra en la parte superior de la pantalla:
         """)
-        st.image("captura_supabase.png", use_container_width=True)
+        st.image("res Folder/captura_supabase.png", use_container_width=True)
         st.write("""
         4. Selecciona el Method "Session pooler":
         """)
@@ -465,6 +465,7 @@ with st.form(key="upload_form"):
 
 ## ------------------------------------------------------------------------------------------------------------------------------------------------------
 ## EJECUCIÓN DEL CÓDIGO AL PRESIONAR EL BOTÓN
+
 if submit_button:
 
     ## ACTUALIZACIÓN DE VARIABLE DE CONTROL 
@@ -546,6 +547,7 @@ if submit_button:
             
     else:
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
