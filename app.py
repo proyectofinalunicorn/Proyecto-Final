@@ -121,6 +121,8 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
 
         ## CREACIÓN DE DICCIONARIO PARA LA COTIZACION ACTUAL
         cotizacion_actual = {}
+
+        # ACTUALIZACIÓN DE PROCESO
         st.write("Obteniendo cotizaciones...")
 
         ## CREACION DE VARIABLE PARA IDENTIFICAR SI HUBO UN ERROR AL MOMENTO DE OBTENER LAS COTIZACIONES
@@ -158,7 +160,7 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
         ## CALCULO DE TENENCIA TOTAL ACTUALIZADA EN PESOS ARGENTINOS
         df_cedears["tenencia_ars"] = (df_cedears.cantidad * df_cedears.ticker.map(cotizacion_actual).fillna(0))*(1-0.006)
 
-        ## CREACION DE FUNCION PARA OBTENER VALOR DE DOLAR ACTUALIZADO
+        ## CREACION DE FUNCION AUXILIAR PARA OBTENER VALOR DE DOLAR ACTUALIZADO
         def obtener_valores_dolar():
             api_url = "https://dolarapi.com/v1/dolares"
             try:
@@ -173,7 +175,7 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
                 st.error(f"Error al cargar valores de dólar: {e}")
                 return None, None
 
-        ## EJECUCIÓN DE LA FUNCIÓN
+        ## EJECUCIÓN DE LA FUNCIÓN AUXILIAR
         st.write("Obteniendo valor del dólar...")
         dolar_oficial, dolar_mep = obtener_valores_dolar()
         if dolar_oficial is None or dolar_mep is None:
@@ -208,7 +210,7 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
         # AÑADIR FECHA DE EJECUCIÓN
         df_cedears_agrupado['fecha_ejecucion'] = datetime.now().date()
 
-        # MODIFICACIÓN PARA INCLUIR TIPO DE MONEDA
+        # MODIFICACIÓN PARA PODER FILTRAR POR TIPO DE MONEDA
         try:
             df_final_largo = pd.wide_to_long(
                 df_cedears_agrupado,
@@ -231,10 +233,9 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
 
         # ACTUALIZACION DE BARRA DE PROGRESO
         barra_progreso.progress(0.80, text="Guardando en Base de Datos...")
-
-        ## DATOS DE CONEXION A SUPABASE (SQL)
         st.write("Conectando a la base de datos...")
-        
+
+        ## DATOS DE CONEXION A SUPABASE (SQL)        
         connection_url = f'postgresql+psycopg2://{db_user}:{db_pass}@{db_host}:5432/{db_name}?sslmode=require'
 
         ## GUARDADO DE DF_CEDEARS CON PRIMARYKEY EN SUPABASE (SQL)
@@ -544,6 +545,7 @@ if submit_button:
             
     else:
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
