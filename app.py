@@ -69,7 +69,20 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
             return False, "Error de archivo"
 
         ## RENOMBRAR COLUMNAS
-        df.rename(columns = {"Cantidad": "cantidad", "Descripcion": "descripcion", "Fecha": "fecha", "Fecha Lote": "fecha_descarga", "Gastos": "gastos", "Moneda": "moneda", "Operacion": "operacion", "Precio Compra": "precio_compra", "Ticker": "ticker", "Tipo": "tipo", "DolarCCL": "dolar_ccl", "DolarMEP": "dolar_mep", "DolarOficial": "dolar_oficial"}, inplace = True)
+        df.rename(columns = {"Cantidad": "cantidad", 
+                             "Descripcion": "descripcion", 
+                             "Fecha": "fecha", 
+                             "Fecha Lote": "fecha_descarga",
+                             "Gastos": "gastos",
+                             "Moneda": "moneda",
+                             "Operacion": "operacion",
+                             "Precio Compra": "precio_compra",
+                             "Ticker": "ticker",
+                             "Tipo": "tipo",
+                             "DolarCCL": "dolar_ccl",
+                             "DolarMEP": "dolar_mep",
+                             "DolarOficial": "dolar_oficial"},
+                  inplace = True)
 
         ## ELIMINACIÓN DE COLUMNAS INNECESARIAS
         columnas_a_borrar = ["dolar_ccl", "operacion"]
@@ -531,6 +544,7 @@ if submit_button:
             
     else:
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
