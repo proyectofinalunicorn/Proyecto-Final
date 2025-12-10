@@ -9,7 +9,7 @@ from datetime import datetime, date
 from sqlalchemy import create_engine, MetaData, Table, Column, String, Date, Float, Integer, Text, text
 from sqlalchemy.pool import NullPool
 
-##INSTRUCTIVO PARA REPORTE DE BALANZ
+##INSTRUCTIVO PARA DESCARGAR REPORTE DE BALANZ
 
 @st.dialog("📥 Cómo descargar el reporte de Balanz")
 def mostrar_instructivo():
@@ -44,15 +44,19 @@ def mostrar_instructivo():
     ✅ **¡Listo!** Ahora cierra esta ventana y sube ese archivo.
     """)
 
+## CREACIÓN DE VARIABLE PARA CONTROLAR QUE EL PROCESO SE EJECUTE CORRECTAMENTE
 if 'procesamiento_listo' not in st.session_state:
     st.session_state.procesamiento_listo = False
 if 'ultimo_mensaje' not in st.session_state:
     st.session_state.ultimo_mensaje = ""
+    
 
+## CREACION DE LA FUNCION PARA PROCESAR LOS DATOS Y GUARDARLOS EN SQL
 
 def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass):
     try:
 
+        ## CREACION DE BARRA DE PROGRESO PARA INDICAR AVANCE
         barra_progreso = st.progress(0, text="Iniciando:")
         
         ## IMPORTACION DE BASE DE DATOS
@@ -95,6 +99,9 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
             df_cedears.costo_ars / np.minimum(df_cedears.dolar_oficial, df_cedears.dolar_mep)
         )
 
+        # ACTUALIZACION DE BARRA DE PROGRESO
+        barra_progreso.progress(0.10)
+        
         ## LISTA UNICA DE ACCIONES
         tickers_unicos = df_cedears.ticker.unique()
 
@@ -102,12 +109,10 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
         cotizacion_actual = {}
         st.write("Obteniendo cotizaciones...")
 
+        ## CREACION DE VARIABLE PARA IDENTIFICAR SI HUBO UN ERROR AL MOMENTO DE OBTENER LAS COTIZACIONES
         error_cotizaciones = False
 
-        ## COTIZACION ACTUALIZADA
-
-        #BARRA PROGRESO
-        barra_progreso.progress(0.10)
+        ## OBTENCION DE COTIZACION ACTUALIZADA
         total_tickers = len(tickers_unicos)    
         
         for i, ticker in enumerate(tickers_unicos):
@@ -121,11 +126,14 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
                     precio = ticker_obj.fast_info["last_price"]
                 cotizacion_actual[ticker] = precio
 
+                ## SE INCLUYE TIEMPO DE ESPERA EN LA EJECUCIÓN PARA EVITAR ERRORES AL MOMENTO DE OBTENER LA COTIZACION
                 time.sleep(0.8)
+                
             except Exception as e:
                 st.warning(f"Error al obtener la cotización de {ticker}: {e}")
                 error_cotizaciones = True
 
+            # ACTUALIZACION DE BARRA DE PROGRESO
             avance = (i + 1) / total_tickers
             barra_progreso.progress(0.10 + (avance * 0.60), text=f"Cotización de {ticker} ({i+1}/{total_tickers})")
 
@@ -157,6 +165,7 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
         if dolar_oficial is None or dolar_mep is None:
             raise Exception("No se pudo obtener el valor del dólar, el proceso no puede continuar.")
 
+        # ACTUALIZACION DE BARRA DE PROGRESO
         barra_progreso.progress(0.70, text="Cotizaciones obtenidas.")
 
         ## CALCULO DE TENENCIA TOTAL ACTUALIZADA EN USD (utilizando el tipo de cambio mas bajo)
@@ -206,6 +215,7 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
             st.error(f"Error en wide_to_long: {e}")
             raise e
 
+        # ACTUALIZACION DE BARRA DE PROGRESO
         barra_progreso.progress(0.80, text="Guardando en Base de Datos...")
 
         ## DATOS DE CONEXION A SUPABASE (SQL)
@@ -213,7 +223,7 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
         
         connection_url = f'postgresql+psycopg2://{db_user}:{db_pass}@{db_host}:5432/{db_name}?sslmode=require'
 
-        # --- 1. GUARDADO DE DF_CEDEARS CON PRIMARYKEY EN SUPABASE (SQL) ---
+        ## GUARDADO DE DF_CEDEARS CON PRIMARYKEY EN SUPABASE (SQL)
         try:
             engine = create_engine(connection_url, poolclass=NullPool)
             with engine.begin() as connection:
@@ -247,8 +257,9 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
                 metadata.create_all(engine)
                 st.write(f"Tabla '{table_name}' creada.")
 
-                # ELIMINACION DE DATOS
+                # ELIMINACION DE DATOS EXISTENTES
                 connection.execute(text(f"TRUNCATE TABLE {table_name} RESTART IDENTITY;"))
+                
                 # INSERCIÓN DE DATOS
                 df_cedears.to_sql(
                     table_name,
@@ -259,11 +270,13 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
         except Exception as e:
             raise e
 
+        # ACTUALIZACION DE BARRA DE PROGRESO
         barra_progreso.progress(0.85, text="Guardando en Base de Datos...")
 
-        # --- 2. GUARDADO DE DATOS HISTORICOS CEDEARS ---
+        ## GUARDADO DE DATOS HISTORICOS CEDEARS EN SQL
         try:
             engine_hist = create_engine(connection_url, poolclass=NullPool)
+            
             # ESTRUCTURA DE LA TABLA
             metadata_hist = MetaData()
             table_name_hist = 'datos_historicos_cedears'
@@ -283,8 +296,8 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
             metadata_hist.create_all(engine_hist)
             st.write(f"Tabla '{table_name_hist}' creada.")
 
+            # INSERCIÓN DE DATOS
             with engine_hist.connect() as connection:
-                # INSERCIÓN DE DATOS
                 try:
                     if 'df_final_listo' not in locals():
                         st.warning("No existe df_final_listo, omitiendo carga de datos históricos.")
@@ -295,8 +308,9 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
                             if_exists='append',
                             index=False
                         )
+                
+                # COMPROBACIÓN DE DATOS DUPLICADOS
                 except Exception as ex:
-                    # COMPROBACIÓN DE DATOS DUPLICADOS
                     if "violates unique constraint" in str(ex) or "duplicate key value" in str(ex):
                         st.warning(f"Advertencia: Datos ya cargados el día de hoy en '{table_name_hist}'.")
                     else:
@@ -304,10 +318,11 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
         except Exception as e:
              raise e
 
+        # ACTUALIZACION DE BARRA DE PROGRESO
         barra_progreso.progress(0.90, text="Guardando en Base de Datos...")
         
 
-        # --- 3. GUARDADO DE DATOS HISTORICOS DOLAR ---
+        ## GUARDADO DE DATOS HISTORICOS DOLAR EN SQL
         st.write("Guardando histórico del dólar...")
         if dolar_oficial and dolar_mep:
             datos_dolar = [
@@ -318,9 +333,9 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
 
             try:
                 engine_dolar = create_engine(connection_url, poolclass=NullPool)
+                # ESTRUCTURA DE LA TABLA
                 metadata_dolar = MetaData()
                 table_name_dolar = 'historico_dolar'
-
                 historico_dolar_table = Table(
                     table_name_dolar, metadata_dolar,
                     Column('fecha', Date, primary_key=True),
@@ -329,10 +344,13 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
                 )
                 metadata_dolar.create_all(engine_dolar)
 
+                # INSERCIÓN DE DATOS
                 with engine_dolar.connect() as connection:
                     try:
                         df_historico_dolar.to_sql(table_name_dolar, connection, if_exists='append', index=False)
                         st.write(f"Tabla '{table_name_dolar}' creada.")
+
+                    # COMPROBACIÓN DE DATOS DUPLICADOS
                     except Exception as ex:
                         if "violates unique constraint" in str(ex) or "duplicate key value" in str(ex):
                             st.warning(f"Cotización del dólar ya cargada el día de hoy")
@@ -343,12 +361,14 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
         else:
             st.error("No se pudieron obtener los valores del dólar para guardar.")
 
+        # ACTUALIZACION DE BARRA DE PROGRESO
         barra_progreso.progress(0.95, text="Guardando en Base de Datos...")
 
-        # --- FINALIZACIÓN EXITOSA ---
+        ## FINALIZACIÓN EXITOSA
         barra_progreso.progress(1.0)
         return True, "¡Proceso completado con éxito!"
 
+    ## DETALLE DE ERRORES
     except Exception as e:
         error_message = str(e).lower() 
         
@@ -368,30 +388,31 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
             st.error(f"Error detallado: {e}")
             return False, f"Error general en el procesamiento: {e}"
 
-# -----------------------------------------------------------------
-# 2. LA INTERFAZ WEB (EL FRONT-END)
-# -----------------------------------------------------------------
+## ------------------------------------------------------------------------------------------------------------------------------------------------------
+## CREACIÓN DEL FRONTEND PARA LA PAGINA WEB
 st.image("logo.png", use_container_width=True)
 st.set_page_config(layout="centered", page_title="Análisis de inversiones")
 st.title("💰 Análisis de inversiones")
 st.write("Sube tu reporte de Balanz y completa los datos de tu Base de Datos de Supabase (PostgreSQL).")
 st.write("El reporte a utilizar corresponde a 'Resultados del periodo' e informe 'Completo'")
 
+## INSTRUCTIVO PARA DESCARGAR REPORTE DE BALANZ
 if st.button("Ver instructivo de descarga", help="Haz clic para ver cómo bajar el Excel de Balanz"):
             mostrar_instructivo()
 st.divider()
 
-# --- Formulario de Carga ---
+# FORMULARIO DE CARGA
 with st.form(key="upload_form"):
     
-    # A. El cargador de archivos
+    # CARGADOR DE ARCHIVOS
     uploaded_file = st.file_uploader("1. Sube tu archivo (Excel)", type=["xlsx"])
     
     st.divider()
     
-    # B. Las credenciales de la DB
+    # CREDENCIALES DE SQL (SUPABASE)
     st.subheader("Credenciales de tu Base de Datos (Supabase)")
     st.info("Si aún no tienes credenciales, [crea tu cuenta gratuita en Supabase](https://supabase.com/dashboard/sign-up).")
+    ## INSTRUCTIVO PARA OBTENER CREDENCIALES DE SUPABASE
     with st.expander("ℹ️ Ver instructivo: ¿Cómo obtengo estos datos?"):
         st.write("""
         1. Crea tu cuenta y proyecto en Supabase.
@@ -421,13 +442,13 @@ with st.form(key="upload_form"):
 
     st.divider()
 
-    # C. El botón de envío
+    ## BOTON PARA INICIAR PROCESO
     submit_button = st.form_submit_button(
         label="🚀 Procesar y Cargar Datos", 
         use_container_width=True
     )
 
-# --- Lógica de Procesamiento (se ejecuta al apretar el botón) ---
+## EJECUCIÓN DEL CÓDIGO AL INICIAR EL PROCESO
 if submit_button:
 
     st.session_state.procesamiento_listo = False
@@ -519,6 +540,7 @@ if submit_button:
     else:
         # Si faltan campos
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
