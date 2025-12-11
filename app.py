@@ -507,7 +507,7 @@ if submit_button:
             ## BOTÓN DE DESCARGA DEL INFORME DE POWER BI
             st.subheader("¡Tus datos están listos!")
             st.write("El siguiente paso es descargar tu plantilla de Power BI. Ábrela, introduce tus credenciales de Supabase (las mismas que usaste aquí) y haz clic en 'Actualizar'.")
-            template_file_name = "Reporte de inversiones - Power BI.pbit" 
+            template_file_name = "res Folder/Reporte de inversiones - Power BI.pbit" 
             with open(template_file_name, "rb") as f:
                 file_data = f.read()
             st.download_button(
@@ -547,6 +547,7 @@ if submit_button:
             
     else:
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
