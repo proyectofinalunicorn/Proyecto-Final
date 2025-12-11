@@ -513,7 +513,7 @@ if submit_button:
             st.download_button(
                 label="📥 Descargar el informe de Power BI",
                 data=file_data,
-                file_name=template_file_name,
+                file_name="Reporte de inversiones - Power BI.pbit",
                 mime="application/vnd.ms-powerbi.template",
                 use_container_width=True
             )
@@ -547,6 +547,7 @@ if submit_button:
             
     else:
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
