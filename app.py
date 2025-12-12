@@ -458,27 +458,27 @@ with st.form(key="upload_form"):
     st.divider()
 
      ## INSTRUCTIVO PARA SOLUCIONAR POSIBLE ERROR DENTRO DE POWER BI
-            with st.expander("ℹ️ Solución de error en Power BI:"):
-                st.write("""
-                1. En caso de presentar el siguiente error deberás seguir los pasos detallados a continuación:
-                """)
-                st.image("res Folder/error1.png", use_container_width=True)
-                st.write("""
-                2. Ingresa a "Archivo", "Opciones y Configuración", y posteriormente a "Configuración de origen de datos":
-                """)
-                st.image("res Folder/error2.png", use_container_width=True)
-                st.write("""
-                3. Selecciona "Editar permisos":
-                """)
-                st.image("res Folder/error3.png", use_container_width=True)
-                st.write("""
-                4. Destilda la opción "Cifrar conexiones":
-                """)
-                st.image("res Folder/error4.png", use_container_width=True)
-                st.write("""
-                5. Por último, selecciona "Actualizar" en la pantalla de Inicio para obtener los datos:
-                """)
-                st.image("res Folder/error5.png", use_container_width=True)
+    with st.expander("ℹ️ Solución de error en Power BI:"):
+        st.write("""
+        1. En caso de presentar el siguiente error deberás seguir los pasos detallados a continuación:
+        """)
+        st.image("res Folder/error1.png", use_container_width=True)
+        st.write("""
+        2. Ingresa a "Archivo", "Opciones y Configuración", y posteriormente a "Configuración de origen de datos":
+        """)
+        st.image("res Folder/error2.png", use_container_width=True)
+        st.write("""
+        3. Selecciona "Editar permisos":
+        """)
+        st.image("res Folder/error3.png", use_container_width=True)
+        st.write("""
+        4. Destilda la opción "Cifrar conexiones":
+        """)
+        st.image("res Folder/error4.png", use_container_width=True)
+        st.write("""
+        5. Por último, selecciona "Actualizar" en la pantalla de Inicio para obtener los datos:
+        """)
+        st.image("res Folder/error5.png", use_container_width=True)
 
 
     st.divider()
@@ -552,6 +552,7 @@ if submit_button:
             
     else:
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
