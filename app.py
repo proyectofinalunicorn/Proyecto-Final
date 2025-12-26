@@ -143,7 +143,7 @@ def procesar_y_guardar_en_sql(archivo_subido, db_host, db_name, db_user, db_pass
                 cotizacion_actual[ticker] = precio
 
                 ## SE INCLUYE TIEMPO DE ESPERA EN LA EJECUCIÓN PARA EVITAR ERRORES AL MOMENTO DE OBTENER LA COTIZACION
-                time.sleep(0.8)
+                time.sleep(1)
                 
             except Exception as e:
                 st.warning(f"Error al obtener la cotización de {ticker}: {e}")
@@ -552,6 +552,7 @@ if submit_button:
             
     else:
         st.warning("Por favor, completa TODOS los campos y sube un archivo.")
+
 
 
 
